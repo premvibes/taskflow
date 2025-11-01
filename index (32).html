@@ -1,0 +1,3651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Modern Light Color Palette */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            /* Background Colors */
+            --bg-main: #fafbfc;
+            --bg-secondary: #f3f4f6;
+            --bg-card: #ffffff;
+            --bg-hover: #f9fafb;
+            --bg-modal: rgba(255, 255, 255, 0.98);
+            
+            /* Text Colors */
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            
+            /* Border & Shadow */
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
+            animation: gradientShift 30s ease infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, 30px) rotate(120deg); }
+            66% { transform: translate(-30px, 30px) rotate(240deg); }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 3.5rem 3rem;
+            border-radius: 24px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: slideUp 0.6s ease;
+            max-width: 460px;
+            width: 90%;
+            backdrop-filter: blur(20px);
+        }
+
+        .login-box h2 {
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .login-box p {
+            color: #64748b;
+            margin-bottom: 2.5rem;
+            font-weight: 500;
+            font-size: 1.05rem;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 1.125rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+            background: white;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), 0 4px 12px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1.125rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            letter-spacing: 0.02em;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .login-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .register-link {
+            margin-top: 1.5rem;
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .register-link:hover {
+            color: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .dashboard-header {
+            max-width: 1600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .greeting {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            padding: 1.75rem 2.25rem;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            animation: slideDown 0.6s ease;
+            transition: all 0.3s;
+        }
+
+        .greeting:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .greeting-text {
+            font-size: 1.875rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .greeting-emoji {
+            font-size: 2rem;
+        }
+
+        .greeting-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid transparent;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: inherit;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .control-btn:hover {
+            background: white;
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .control-btn.trash {
+            color: var(--warning);
+        }
+
+        .control-btn.trash:hover {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .control-btn.logout {
+            color: var(--danger);
+        }
+
+        .control-btn.logout:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .main-container {
+            max-width: 1600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .workspace-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            animation: slideDown 0.6s ease 0.1s both;
+        }
+
+        .workspace-header h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .add-workspace-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.875rem 1.75rem;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            font-family: inherit;
+        }
+
+        .add-workspace-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .add-workspace-btn i {
+            font-size: 1.1rem;
+        }
+
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            animation: fadeIn 0.8s ease 0.2s both;
+        }
+
+        .workspace-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .workspace-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .workspace-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .workspace-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .workspace-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.25rem;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .workspace-name {
+            font-size: 1.375rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .workspace-meta {
+            display: flex;
+            gap: 1.25rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .workspace-actions {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+
+        .workspace-card:hover .workspace-actions {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .action-icon-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            box-shadow: var(--shadow);
+        }
+
+        .action-icon-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .action-icon-btn.edit:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-icon-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Projects Section */
+        .projects-container {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .projects-container.visible {
+            display: block;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+        }
+
+        .breadcrumb-item:hover {
+            color: var(--primary);
+            background: var(--bg-secondary);
+        }
+
+        .breadcrumb-separator {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .projects-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .projects-header h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .project-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--info) 0%, var(--success) 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--info);
+        }
+
+        .project-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .project-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.625rem;
+            margin-bottom: 1.25rem;
+            background: linear-gradient(135deg, var(--info) 0%, var(--success) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .project-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .project-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .project-actions {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+
+        .project-card:hover .project-actions {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Task Management Section */
+        .task-management {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .task-management.visible {
+            display: block;
+        }
+
+        .task-header {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .task-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .task-header-title h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .current-date {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .task-controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .task-filter-section {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 0.625rem 1.25rem;
+            border: 2px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+        }
+
+        .filter-btn:hover {
+            background: white;
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            padding: 1.75rem;
+            border-radius: 18px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary-light);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .stat-card.overdue .stat-value {
+            color: var(--danger);
+        }
+
+        .stat-card.open .stat-value {
+            color: var(--info);
+        }
+
+        .stat-card.progress .stat-value {
+            color: var(--warning);
+        }
+
+        .stat-card.done .stat-value {
+            color: var(--success);
+        }
+
+        /* Kanban Board Styles */
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .kanban-column {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .kanban-column.overdue {
+            border-top: 4px solid var(--danger);
+        }
+
+        .kanban-column.open {
+            border-top: 4px solid var(--info);
+        }
+
+        .kanban-column.in-progress {
+            border-top: 4px solid var(--warning);
+        }
+
+        .kanban-column.done {
+            border-top: 4px solid var(--success);
+        }
+
+        .kanban-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .kanban-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .kanban-count {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.625rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+
+        .kanban-add-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 2px dashed var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.3s;
+        }
+
+        .kanban-add-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .kanban-tasks {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            min-height: 100px;
+        }
+
+        .kanban-tasks.drag-over {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+        }
+
+        .kanban-task {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            padding: 1.25rem;
+            cursor: move;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .kanban-task:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary-light);
+        }
+
+        .kanban-task.dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+        }
+
+        .kanban-task-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: all 0.3s;
+            position: relative;
+            background: white;
+        }
+
+        .task-checkbox:hover {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .task-checkbox.checked {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .task-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .kanban-task-title {
+            flex: 1;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.4;
+            word-break: break-word;
+            transition: all 0.3s;
+        }
+
+        .kanban-task-title.completed {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .kanban-task-title.editable {
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 0.5rem;
+            background: white;
+            outline: none;
+        }
+
+        .kanban-task-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.375rem;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .kanban-task:hover .kanban-task-actions {
+            opacity: 1;
+        }
+
+        .kanban-task-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .kanban-task-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .kanban-task-btn.edit:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .kanban-task-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .kanban-task-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .kanban-task-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .kanban-task-priority {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .kanban-task-priority.high {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .kanban-task-priority.medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .kanban-task-priority.low {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .kanban-empty {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .kanban-empty i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .kanban-empty p {
+            font-size: 0.95rem;
+        }
+
+        .tasks-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .task-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 18px;
+            padding: 1.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .task-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            transition: all 0.3s;
+        }
+
+        .task-card.priority-high::before {
+            background: var(--danger);
+        }
+
+        .task-card.priority-medium::before {
+            background: var(--warning);
+        }
+
+        .task-card.priority-low::before {
+            background: var(--success);
+        }
+
+        .task-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .task-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .task-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+            line-height: 1.4;
+        }
+
+        .task-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.25rem;
+        }
+
+        .task-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .task-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .task-meta-row i {
+            width: 18px;
+            color: var(--primary);
+        }
+
+        .task-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border-light);
+        }
+
+        .priority-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .priority-badge.high {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .priority-badge.medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .priority-badge.low {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-select {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .status-select:hover {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .status-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .task-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+        }
+
+        .task-action-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .task-action-btn.edit:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .task-action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 560px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid var(--border);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .close-modal {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: none;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 1.25rem;
+        }
+
+        .close-modal:hover {
+            background: var(--danger);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.625rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.875rem 1.125rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-family: inherit;
+            background: var(--bg-main);
+            color: var(--text-primary);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: white;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Trash Modal */
+        .trash-items {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .trash-item {
+            background: var(--bg-secondary);
+            padding: 1.25rem;
+            border-radius: 14px;
+            margin-bottom: 1rem;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .trash-item:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .trash-info {
+            margin-bottom: 1rem;
+        }
+
+        .trash-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.05rem;
+        }
+
+        .trash-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .trash-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .restore-btn,
+        .permanent-delete-btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: inherit;
+        }
+
+        .restore-btn {
+            background: var(--success);
+            color: white;
+        }
+
+        .restore-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .permanent-delete-btn {
+            background: var(--danger);
+            color: white;
+        }
+
+        .permanent-delete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Import/Export Modal */
+        .import-export-options {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .option-btn {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .option-btn:hover {
+            background: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .option-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .option-content h4 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.375rem;
+        }
+
+        .option-content p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Custom Calendar Picker */
+        .calendar-picker {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .calendar-month-year {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .calendar-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .calendar-nav-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 0.5rem;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid transparent;
+        }
+
+        .calendar-day:hover {
+            background: var(--primary-light);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .calendar-day.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+
+        .calendar-day.in-range {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-dark);
+        }
+
+        .calendar-day.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.today {
+            border-color: var(--primary);
+        }
+
+        .calendar-info {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .calendar-selected-dates {
+            margin-top: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-header,
+            .main-container {
+                padding: 0 1rem;
+            }
+
+            .greeting {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+
+            .greeting-text {
+                font-size: 1.5rem;
+            }
+
+            .greeting-actions {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .workspace-grid,
+            .project-grid,
+            .tasks-container {
+                grid-template-columns: 1fr;
+            }
+
+            .statistics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .task-header-top {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .task-controls {
+                width: 100%;
+            }
+
+            .task-filter-section {
+                width: 100%;
+            }
+
+            .filter-btn {
+                flex: 1;
+                min-width: 100px;
+            }
+
+            .modal-content {
+                padding: 1.75rem;
+                width: 95%;
+            }
+
+            .workspace-header h2,
+            .projects-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
+        }
+
+        /* Loading Animation */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Success Message */
+        .success-message {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            animation: slideDown 0.3s ease;
+            z-index: 10001;
+            font-weight: 600;
+        }
+
+        /* Error Message */
+        .error-message {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--danger);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            animation: slideDown 0.3s ease;
+            z-index: 10001;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <h2>🎯 Welcome Back</h2>
+            <p>Enter your secret code to continue</p>
+            <input type="password" id="secretCodeInput" placeholder="Enter your secret code" autofocus>
+            <button class="login-btn" onclick="login()">Access Dashboard</button>
+            <a href="register.html" class="register-link">Create New Account →</a>
+        </div>
+    </div>
+
+    <!-- Dashboard Header -->
+    <div id="dashboard" style="display: none;">
+        <div class="dashboard-header">
+            <div class="greeting">
+                <div class="greeting-text">
+                    <span id="greeting">Hello</span> <span id="userName"></span><span id="genderEmoji"></span>
+                </div>
+                <div class="greeting-actions">
+                    <button class="control-btn trash" onclick="showTrash()">
+                        <i class="fas fa-trash"></i> Trash
+                    </button>
+                    <button class="control-btn" onclick="showImportExportOptions()">
+                        <i class="fas fa-file-export"></i> Backup
+                    </button>
+                    <button class="control-btn logout" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Workspaces Section -->
+            <div id="workspacesSection">
+                <div class="workspace-header">
+                    <h2>📚 Workspaces</h2>
+                    <button class="add-workspace-btn" onclick="showWorkspaceModal()">
+                        <i class="fas fa-plus"></i> Create Workspace
+                    </button>
+                </div>
+                <div id="workspacesGrid" class="workspace-grid"></div>
+            </div>
+
+            <!-- Projects Container -->
+            <div id="projectsContainer" class="projects-container">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item" onclick="backToWorkspaces()">
+                        <i class="fas fa-home"></i> Workspaces
+                    </span>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item">
+                        <span id="currentWorkspaceName"></span>
+                    </span>
+                </div>
+                <div class="projects-header">
+                    <h2>📁 Projects</h2>
+                    <button class="add-workspace-btn" onclick="showProjectModal()">
+                        <i class="fas fa-plus"></i> Create Project
+                    </button>
+                </div>
+                <div id="projectsGrid" class="project-grid"></div>
+            </div>
+
+            <!-- Task Management Section -->
+            <div id="taskManagementSection" class="task-management">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item" onclick="backToWorkspaces()">
+                        <i class="fas fa-home"></i> Workspaces
+                    </span>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item" onclick="backToProjects()">
+                        <span id="breadcrumbWorkspaceName"></span>
+                    </span>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item">
+                        <span id="breadcrumbProjectName"></span>
+                    </span>
+                </div>
+
+                <div class="task-header">
+                    <div class="task-header-top">
+                        <div class="task-header-title">
+                            <h2 id="projectTitle"></h2>
+                            <div class="current-date">
+                                <span id="currentDay"></span>, <span id="currentDate"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="task-filter-section">
+                        <div class="filter-group">
+                            <button class="filter-btn active" data-filter="all" onclick="filterTasks('all')">
+                                <i class="fas fa-list"></i> All
+                            </button>
+                            <button class="filter-btn" data-filter="today" onclick="filterTasks('today')">
+                                <i class="fas fa-calendar-day"></i> Today
+                            </button>
+                            <button class="filter-btn" data-filter="week" onclick="filterTasks('week')">
+                                <i class="fas fa-calendar-week"></i> This Week
+                            </button>
+                            <button class="filter-btn" data-filter="month" onclick="filterTasks('month')">
+                                <i class="fas fa-calendar"></i> This Month
+                            </button>
+                            <button class="filter-btn" data-filter="year" onclick="filterTasks('year')">
+                                <i class="fas fa-calendar-alt"></i> This Year
+                            </button>
+                            <button class="filter-btn" data-filter="custom" onclick="showCustomDatePicker()">
+                                <i class="fas fa-calendar-plus"></i> Custom
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="statistics">
+                    <div class="stat-card overdue">
+                        <div class="stat-label">Overdue Tasks</div>
+                        <div class="stat-value" id="overdueCount">0</div>
+                    </div>
+                    <div class="stat-card open">
+                        <div class="stat-label">Open Tasks</div>
+                        <div class="stat-value" id="openCount">0</div>
+                    </div>
+                    <div class="stat-card progress">
+                        <div class="stat-label">In Progress</div>
+                        <div class="stat-value" id="progressCount">0</div>
+                    </div>
+                    <div class="stat-card done">
+                        <div class="stat-label">Completed</div>
+                        <div class="stat-value" id="doneCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Tasks</div>
+                        <div class="stat-value" id="totalCount">0</div>
+                    </div>
+                </div>
+
+                <div class="kanban-board">
+                    <div class="kanban-column overdue">
+                        <div class="kanban-header">
+                            <div class="kanban-title">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Overdue
+                                <span class="kanban-count" id="overdueKanbanCount">0</span>
+                            </div>
+                        </div>
+                        <div class="kanban-tasks" id="overdueKanban" data-status="overdue"></div>
+                    </div>
+
+                    <div class="kanban-column open">
+                        <div class="kanban-header">
+                            <div class="kanban-title">
+                                <i class="fas fa-inbox"></i>
+                                Open
+                                <span class="kanban-count" id="openKanbanCount">0</span>
+                            </div>
+                            <button class="kanban-add-btn" onclick="addQuickTask('open')">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="kanban-tasks" id="openKanban" data-status="open"></div>
+                    </div>
+
+                    <div class="kanban-column in-progress">
+                        <div class="kanban-header">
+                            <div class="kanban-title">
+                                <i class="fas fa-spinner"></i>
+                                In Progress
+                                <span class="kanban-count" id="progressKanbanCount">0</span>
+                            </div>
+                            <button class="kanban-add-btn" onclick="addQuickTask('in-progress')">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="kanban-tasks" id="progressKanban" data-status="in-progress"></div>
+                    </div>
+
+                    <div class="kanban-column done">
+                        <div class="kanban-header">
+                            <div class="kanban-title">
+                                <i class="fas fa-check-circle"></i>
+                                Completed
+                                <span class="kanban-count" id="doneKanbanCount">0</span>
+                            </div>
+                            <button class="kanban-add-btn" onclick="addQuickTask('done')">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="kanban-tasks" id="doneKanban" data-status="done"></div>
+                    </div>
+                </div>
+
+                <div id="tasksContainer" class="tasks-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workspace Modal -->
+    <div id="workspaceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="workspaceModalTitle">Create Workspace</h3>
+                <button class="close-modal" onclick="closeWorkspaceModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="form-group">
+                <label>Workspace Name</label>
+                <input type="text" id="workspaceName" placeholder="e.g., Personal Projects">
+            </div>
+            <div class="form-group">
+                <label>Icon (Emoji)</label>
+                <input type="text" id="workspaceIcon" placeholder="e.g., 📚" maxlength="2">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeWorkspaceModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveWorkspace()">Save Workspace</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Modal -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="projectModalTitle">Create Project</h3>
+                <button class="close-modal" onclick="closeProjectModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="form-group">
+                <label>Project Name</label>
+                <input type="text" id="projectName" placeholder="e.g., Website Redesign">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="projectDescription" placeholder="Brief description of the project"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Icon (Emoji)</label>
+                <input type="text" id="projectIcon" placeholder="e.g., 💼" maxlength="2">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeProjectModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveProject()">Save Project</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="taskModalTitle">Create Task</h3>
+                <button class="close-modal" onclick="closeTaskModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="form-group">
+                <label>Task Title</label>
+                <input type="text" id="taskTitle" placeholder="e.g., Design landing page">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="taskDescription" placeholder="Task details..."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" id="taskStartDate">
+                </div>
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input type="date" id="taskDueDate">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select id="taskPriority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="taskStatus">
+                        <option value="open" selected>Open</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="done">Done</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeTaskModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveTask()">Save Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Date Filter Modal -->
+    <div id="customDateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Custom Date Range</h3>
+                <button class="close-modal" onclick="closeCustomDateModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="calendar-picker">
+                <div class="calendar-header">
+                    <button class="calendar-nav-btn" onclick="changeMonth(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="calendar-month-year" id="calendarMonthYear"></div>
+                    <button class="calendar-nav-btn" onclick="changeMonth(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="calendar-weekdays">
+                    <div class="calendar-weekday">Su</div>
+                    <div class="calendar-weekday">Mo</div>
+                    <div class="calendar-weekday">Tu</div>
+                    <div class="calendar-weekday">We</div>
+                    <div class="calendar-weekday">Th</div>
+                    <div class="calendar-weekday">Fr</div>
+                    <div class="calendar-weekday">Sa</div>
+                </div>
+                <div class="calendar-days" id="calendarDays"></div>
+                <div class="calendar-info">
+                    <div>Click on two dates to select a range (filter applies automatically)</div>
+                    <div class="calendar-selected-dates" id="selectedDatesInfo">No dates selected</div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeCustomDateModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trash Modal -->
+    <div id="trashModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🗑️ Trash</h3>
+                <button class="close-modal" onclick="closeTrashModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="trashItems" class="trash-items"></div>
+        </div>
+    </div>
+
+    <!-- Import/Export Modal -->
+    <div id="importExportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💾 Backup & Restore</h3>
+                <button class="close-modal" onclick="closeImportExportModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="import-export-options">
+                <button class="option-btn" onclick="exportToFile()">
+                    <div class="option-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <div class="option-content">
+                        <h4>Export Data</h4>
+                        <p>Download all your data as a JSON file</p>
+                    </div>
+                </button>
+                <button class="option-btn" onclick="importFromFile()">
+                    <div class="option-icon">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <div class="option-content">
+                        <h4>Import Data</h4>
+                        <p>Restore data from a backup file</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" accept=".json" style="display: none" onchange="handleFileImport(event)">
+
+    <script src="https://successunlock.com/taskflow/api.php"></script>
+    <script>
+        const API_URL = 'https://successunlock.com/taskflow/api.php';
+        
+        let userCode = '';
+        let userName = '';
+        let userGender = 'male';
+        
+        let workspaces = [];
+        let projects = [];
+        let tasks = [];
+        let deletedItems = [];
+        
+        let currentWorkspaceId = null;
+        let currentProjectId = null;
+        let editingWorkspaceId = null;
+        let editingProjectId = null;
+        let editingTaskId = null;
+        
+        let currentTimeFilter = 'all';
+        let selectedDateStart = null;
+        let selectedDateEnd = null;
+        let calendarCurrentMonth = new Date();
+        let calendarSelectedDates = [];
+
+        // ==================== INITIALIZATION ====================
+        window.onload = function() {
+            const savedCode = localStorage.getItem('userCode');
+            if (savedCode) {
+                verifyAndLogin(savedCode);
+            }
+        };
+
+        document.getElementById('secretCodeInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+
+        async function login() {
+            const code = document.getElementById('secretCodeInput').value.trim();
+            
+            if (!code) {
+                alert('Please enter your secret code!');
+                return;
+            }
+            
+            await verifyAndLogin(code);
+        }
+
+        async function verifyAndLogin(code) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'verify-user',
+                        code: code
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    userCode = code;
+                    userName = result.name;
+                    userGender = result.gender || 'male';
+                    
+                    localStorage.setItem('userCode', code);
+                    
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    document.getElementById('userName').textContent = userName;
+                    
+                    await loadUserData();
+                    updateGreeting();
+                    updateCurrentDate();
+                } else {
+                    alert('❌ Invalid secret code!');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('❌ Network error. Please try again.');
+            }
+        }
+
+        async function loadUserData() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'get-all-data',
+                        code: userCode
+                    })
+                });
+
+                const result = await response.json();
+                
+                console.log('=== DATA LOADED FROM SERVER ===');
+                console.log('Workspaces:', result.workspaces);
+                console.log('Projects:', result.projects);
+                console.log('Tasks:', result.tasks);
+
+                if (result.success) {
+                    workspaces = result.workspaces || [];
+                    projects = result.projects || [];
+                    tasks = result.tasks || [];
+                    
+                    console.log('=== DATA ASSIGNED TO VARIABLES ===');
+                    console.log('workspaces array:', workspaces);
+                    console.log('projects array:', projects);
+                    console.log('tasks array:', tasks);
+                    
+                    // Also load deleted items from localStorage (not synced to server)
+                    const savedDeleted = localStorage.getItem(`deleted_${userCode}`);
+                    if (savedDeleted) deletedItems = JSON.parse(savedDeleted);
+                    
+                    // Restore last viewed workspace and project if they exist
+                    const lastWorkspaceId = localStorage.getItem(`lastWorkspaceId_${userCode}`);
+                    const lastProjectId = localStorage.getItem(`lastProjectId_${userCode}`);
+                    
+                    if (lastProjectId && lastWorkspaceId) {
+                        const project = projects.find(p => p.id === parseInt(lastProjectId));
+                        const workspace = workspaces.find(w => w.id === parseInt(lastWorkspaceId));
+                        
+                        if (project && workspace) {
+                            // Restore to project view
+                            currentWorkspaceId = parseInt(lastWorkspaceId);
+                            currentProjectId = parseInt(lastProjectId);
+                            
+                            document.getElementById('currentWorkspaceName').textContent = workspace.name;
+                            document.getElementById('projectTitle').textContent = project.name;
+                            document.getElementById('breadcrumbProjectName').textContent = project.name;
+                            document.getElementById('breadcrumbWorkspaceName').textContent = workspace.name;
+                            
+                            document.getElementById('workspacesSection').style.display = 'none';
+                            document.getElementById('projectsContainer').style.display = 'none';
+                            document.getElementById('taskManagementSection').style.display = 'block';
+                            document.getElementById('taskManagementSection').classList.add('visible');
+                            document.getElementById('tasksContainer').style.display = 'none';
+                            
+                            renderKanbanBoard();
+                            updateStatistics();
+                            return;
+                        }
+                    } else if (lastWorkspaceId) {
+                        const workspace = workspaces.find(w => w.id === parseInt(lastWorkspaceId));
+                        
+                        if (workspace) {
+                            // Restore to workspace view
+                            currentWorkspaceId = parseInt(lastWorkspaceId);
+                            
+                            document.getElementById('currentWorkspaceName').textContent = workspace.name;
+                            document.getElementById('workspacesSection').style.display = 'none';
+                            document.getElementById('projectsContainer').style.display = 'block';
+                            document.getElementById('projectsContainer').classList.add('visible');
+                            document.getElementById('taskManagementSection').style.display = 'none';
+                            
+                            renderProjects();
+                            return;
+                        }
+                    }
+                    
+                    // Default: show workspaces
+                    renderWorkspaces();
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+                renderWorkspaces();
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('userCode');
+                location.reload();
+            }
+        }
+
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = '';
+            let emoji = '';
+            
+            if (hour < 12) {
+                greeting = 'Good Morning';
+                emoji = '🌅';
+            } else if (hour < 17) {
+                greeting = 'Good Afternoon';
+                emoji = '☀️';
+            } else {
+                greeting = 'Good Evening';
+                emoji = '🌙';
+            }
+            
+            const honorific = userGender === 'female' ? "Ma'am" : 'Sir';
+            
+            document.getElementById('greeting').textContent = `${greeting}, `;
+            document.getElementById('genderEmoji').textContent = ` ${honorific}! ${emoji}`;
+        }
+
+        function updateCurrentDate() {
+            const now = new Date();
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            if (currentTimeFilter === 'custom' && selectedDateStart && selectedDateEnd) {
+                const start = new Date(selectedDateStart);
+                const end = new Date(selectedDateEnd);
+                
+                document.getElementById('currentDay').textContent = 'Custom Range';
+                document.getElementById('currentDate').textContent = `${months[start.getMonth()]} ${start.getDate()} - ${months[end.getMonth()]} ${end.getDate()}, ${end.getFullYear()}`;
+            } else {
+                const dayName = days[now.getDay()];
+                const monthName = months[now.getMonth()];
+                const date = now.getDate();
+                const year = now.getFullYear();
+                
+                document.getElementById('currentDay').textContent = dayName;
+                document.getElementById('currentDate').textContent = `${monthName} ${date}, ${year}`;
+            }
+        }
+
+        // ==================== WORKSPACES ====================
+        function renderWorkspaces() {
+            const grid = document.getElementById('workspacesGrid');
+            
+            if (workspaces.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <p>No workspaces yet. Create one to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = workspaces.map(ws => {
+                const wsIdNum = parseInt(ws.id);
+                const projectCount = projects.filter(p => parseInt(p.workspaceId) === wsIdNum).length;
+                const taskCount = tasks.filter(t => {
+                    const project = projects.find(p => parseInt(p.id) === parseInt(t.projectId));
+                    return project && parseInt(project.workspaceId) === wsIdNum;
+                }).length;
+                
+                return `
+                    <div class="workspace-card" onclick="openWorkspace(${ws.id})">
+                        <div class="workspace-icon">${ws.icon || '📚'}</div>
+                        <div class="workspace-name">${ws.name}</div>
+                        <div class="workspace-meta">
+                            <span><i class="fas fa-folder"></i> ${projectCount} Projects</span>
+                            <span><i class="fas fa-tasks"></i> ${taskCount} Tasks</span>
+                        </div>
+                        <div class="workspace-actions">
+                            <button class="action-icon-btn edit" onclick="event.stopPropagation(); editWorkspace(${ws.id})">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button class="action-icon-btn delete" onclick="event.stopPropagation(); deleteWorkspace(${ws.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showWorkspaceModal() {
+            editingWorkspaceId = null;
+            document.getElementById('workspaceModalTitle').textContent = 'Create Workspace';
+            document.getElementById('workspaceName').value = '';
+            document.getElementById('workspaceIcon').value = '';
+            document.getElementById('workspaceModal').classList.add('active');
+        }
+
+        function closeWorkspaceModal() {
+            document.getElementById('workspaceModal').classList.remove('active');
+            editingWorkspaceId = null;
+        }
+
+        function saveWorkspace() {
+            const name = document.getElementById('workspaceName').value.trim();
+            const icon = document.getElementById('workspaceIcon').value.trim();
+            
+            if (!name) {
+                alert('Please enter a workspace name!');
+                return;
+            }
+            
+            if (editingWorkspaceId) {
+                const workspace = workspaces.find(w => w.id === editingWorkspaceId);
+                workspace.name = name;
+                workspace.icon = icon || '📚';
+            } else {
+                workspaces.push({
+                    id: Date.now(),
+                    name: name,
+                    icon: icon || '📚',
+                    createdAt: new Date().toISOString()
+                });
+            }
+            
+            saveWorkspaces();
+            renderWorkspaces();
+            closeWorkspaceModal();
+        }
+
+        function editWorkspace(id) {
+            const workspace = workspaces.find(w => w.id === id);
+            if (!workspace) return;
+            
+            editingWorkspaceId = id;
+            document.getElementById('workspaceModalTitle').textContent = 'Edit Workspace';
+            document.getElementById('workspaceName').value = workspace.name;
+            document.getElementById('workspaceIcon').value = workspace.icon;
+            document.getElementById('workspaceModal').classList.add('active');
+        }
+
+        function deleteWorkspace(id) {
+            if (confirm('Delete this workspace and all its projects?')) {
+                const workspace = workspaces.find(w => w.id === id);
+                workspaces = workspaces.filter(w => w.id !== id);
+                
+                const wsProjects = projects.filter(p => p.workspaceId === id);
+                wsProjects.forEach(proj => {
+                    deletedItems.push({...proj, type: 'project', deletedAt: Date.now()});
+                });
+                
+                projects = projects.filter(p => p.workspaceId !== id);
+                
+                saveWorkspaces();
+                saveProjects();
+                saveDeletedItems();
+                renderWorkspaces();
+            }
+        }
+
+        function openWorkspace(id) {
+            console.log('=== OPENING WORKSPACE ===');
+            console.log('Workspace ID clicked:', id, 'Type:', typeof id);
+            console.log('All workspaces:', workspaces);
+            console.log('All projects before filtering:', projects);
+            
+            currentWorkspaceId = id;
+            const workspace = workspaces.find(w => w.id === id);
+            
+            console.log('Found workspace:', workspace);
+            console.log('Setting currentWorkspaceId to:', currentWorkspaceId);
+            
+            // Save current workspace ID for page refresh persistence
+            localStorage.setItem(`lastWorkspaceId_${userCode}`, id);
+            
+            document.getElementById('currentWorkspaceName').textContent = workspace.name;
+            document.getElementById('workspacesSection').style.display = 'none';
+            document.getElementById('projectsContainer').style.display = 'block';
+            document.getElementById('projectsContainer').classList.add('visible');
+            document.getElementById('taskManagementSection').style.display = 'none';
+            document.getElementById('taskManagementSection').classList.remove('visible');
+            
+            console.log('About to call renderProjects()...');
+            renderProjects();
+        }
+
+        function backToWorkspaces() {
+            currentWorkspaceId = null;
+            currentProjectId = null;
+            
+            // Clear last project storage
+            localStorage.removeItem(`lastProjectId_${userCode}`);
+            localStorage.removeItem(`lastWorkspaceId_${userCode}`);
+            
+            document.getElementById('workspacesSection').style.display = 'block';
+            document.getElementById('projectsContainer').classList.remove('visible');
+            document.getElementById('projectsContainer').style.display = 'none';
+            document.getElementById('taskManagementSection').classList.remove('visible');
+            document.getElementById('taskManagementSection').style.display = 'none';
+            
+            renderWorkspaces();
+        }
+
+        async function saveWorkspaces() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'save-workspaces',
+                        code: userCode,
+                        workspaces: workspaces
+                    })
+                });
+
+                const result = await response.json();
+                if (!result.success) {
+                    console.error('Failed to sync workspaces');
+                }
+            } catch (error) {
+                console.error('Workspace sync error:', error);
+            }
+        }
+
+        // ==================== PROJECTS ====================
+        function renderProjects() {
+            console.log('=== RENDER PROJECTS ===');
+            console.log('currentWorkspaceId:', currentWorkspaceId, 'Type:', typeof currentWorkspaceId);
+            console.log('All projects:', projects);
+            projects.forEach(p => {
+                console.log(`Project ${p.id} (${p.name}): workspaceId=${p.workspaceId} (type: ${typeof p.workspaceId})`);
+            });
+            
+            const grid = document.getElementById('projectsGrid');
+            // Convert to number to avoid type mismatch
+            const workspaceIdNum = parseInt(currentWorkspaceId);
+            const wsProjects = projects.filter(p => parseInt(p.workspaceId) === workspaceIdNum);
+            
+            console.log('Filtered projects for this workspace:', wsProjects);
+            
+            if (wsProjects.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-folder-plus"></i>
+                        <p>No projects yet. Create one to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = wsProjects.map(proj => {
+                const projIdNum = parseInt(proj.id);
+                const taskCount = tasks.filter(t => parseInt(t.projectId) === projIdNum).length;
+                
+                return `
+                    <div class="project-card" onclick="openProject(${proj.id})">
+                        <div class="project-icon">${proj.icon || '💼'}</div>
+                        <div class="project-name">${proj.name}</div>
+                        <div class="project-description">${proj.description || 'No description'}</div>
+                        <div class="project-meta">
+                            <span><i class="fas fa-tasks"></i> ${taskCount} Tasks</span>
+                        </div>
+                        <div class="project-actions">
+                            <button class="action-icon-btn edit" onclick="event.stopPropagation(); editProject(${proj.id})">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button class="action-icon-btn delete" onclick="event.stopPropagation(); deleteProject(${proj.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showProjectModal() {
+            editingProjectId = null;
+            document.getElementById('projectModalTitle').textContent = 'Create Project';
+            document.getElementById('projectName').value = '';
+            document.getElementById('projectDescription').value = '';
+            document.getElementById('projectIcon').value = '';
+            document.getElementById('projectModal').classList.add('active');
+        }
+
+        function closeProjectModal() {
+            document.getElementById('projectModal').classList.remove('active');
+            editingProjectId = null;
+        }
+
+        function saveProject() {
+            const name = document.getElementById('projectName').value.trim();
+            const description = document.getElementById('projectDescription').value.trim();
+            const icon = document.getElementById('projectIcon').value.trim();
+            
+            console.log('=== SAVING PROJECT ===');
+            console.log('currentWorkspaceId:', currentWorkspaceId, 'Type:', typeof currentWorkspaceId);
+            console.log('Project name:', name);
+            
+            if (!name) {
+                alert('Please enter a project name!');
+                return;
+            }
+            
+            if (editingProjectId) {
+                const project = projects.find(p => p.id === editingProjectId);
+                project.name = name;
+                project.description = description;
+                project.icon = icon || '💼';
+                console.log('Updated existing project:', project);
+            } else {
+                const newProject = {
+                    id: Date.now(),
+                    workspaceId: currentWorkspaceId,
+                    name: name,
+                    description: description,
+                    icon: icon || '💼',
+                    createdAt: new Date().toISOString()
+                };
+                projects.push(newProject);
+                console.log('Created new project:', newProject);
+                console.log('All projects now:', projects);
+            }
+            
+            saveProjects();
+            renderProjects();
+            closeProjectModal();
+        }
+
+        function editProject(id) {
+            const project = projects.find(p => p.id === id);
+            if (!project) return;
+            
+            editingProjectId = id;
+            document.getElementById('projectModalTitle').textContent = 'Edit Project';
+            document.getElementById('projectName').value = project.name;
+            document.getElementById('projectDescription').value = project.description;
+            document.getElementById('projectIcon').value = project.icon;
+            document.getElementById('projectModal').classList.add('active');
+        }
+
+        function deleteProject(id) {
+            if (confirm('Delete this project and all its tasks?')) {
+                const project = projects.find(p => p.id === id);
+                projects = projects.filter(p => p.id !== id);
+                
+                const projTasks = tasks.filter(t => t.projectId === id);
+                projTasks.forEach(task => {
+                    deletedItems.push({...task, type: 'task', deletedAt: Date.now()});
+                });
+                
+                tasks = tasks.filter(t => t.projectId !== id);
+                
+                saveProjects();
+                saveTasks();
+                saveDeletedItems();
+                renderProjects();
+            }
+        }
+
+        function openProject(id) {
+            currentProjectId = id;
+            const project = projects.find(p => p.id === id);
+            const workspace = workspaces.find(w => w.id === project.workspaceId);
+            
+            // Save current project ID for page refresh persistence
+            localStorage.setItem(`lastProjectId_${userCode}`, id);
+            
+            document.getElementById('projectTitle').textContent = project.name;
+            document.getElementById('breadcrumbProjectName').textContent = project.name;
+            document.getElementById('breadcrumbWorkspaceName').textContent = workspace.name;
+            
+            document.getElementById('projectsContainer').style.display = 'none';
+            document.getElementById('projectsContainer').classList.remove('visible');
+            document.getElementById('taskManagementSection').style.display = 'block';
+            document.getElementById('taskManagementSection').classList.add('visible');
+            
+            // Hide old task cards view
+            document.getElementById('tasksContainer').style.display = 'none';
+            
+            currentTimeFilter = 'all';
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === 'all');
+            });
+            
+            updateCurrentDate();
+            renderKanbanBoard();
+            updateStatistics();
+        }
+
+        function backToProjects() {
+            currentProjectId = null;
+            
+            // Clear last project storage
+            localStorage.removeItem(`lastProjectId_${userCode}`);
+            
+            document.getElementById('projectsContainer').style.display = 'block';
+            document.getElementById('projectsContainer').classList.add('visible');
+            document.getElementById('taskManagementSection').style.display = 'none';
+            document.getElementById('taskManagementSection').classList.remove('visible');
+            
+            // Re-render projects to ensure they're displayed
+            renderProjects();
+        }
+
+        async function saveProjects() {
+            console.log('=== SAVING PROJECTS TO SERVER ===');
+            console.log('Projects to save:', projects);
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'save-projects',
+                        code: userCode,
+                        projects: projects
+                    })
+                });
+
+                const result = await response.json();
+                console.log('Save projects response:', result);
+                
+                if (!result.success) {
+                    console.error('Failed to sync projects:', result);
+                }
+            } catch (error) {
+                console.error('Project sync error:', error);
+            }
+        }
+
+        // ==================== TASKS ====================
+        function showTaskModal() {
+            editingTaskId = null;
+            document.getElementById('taskModalTitle').textContent = 'Create Task';
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskDescription').value = '';
+            document.getElementById('taskStartDate').value = '';
+            document.getElementById('taskDueDate').value = '';
+            document.getElementById('taskPriority').value = 'medium';
+            document.getElementById('taskStatus').value = 'open';
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        function closeTaskModal() {
+            document.getElementById('taskModal').classList.remove('active');
+            editingTaskId = null;
+        }
+
+        async function saveTask() {
+            const title = document.getElementById('taskTitle').value.trim();
+            const description = document.getElementById('taskDescription').value.trim();
+            const startDate = document.getElementById('taskStartDate').value;
+            const dueDate = document.getElementById('taskDueDate').value;
+            const priority = document.getElementById('taskPriority').value;
+            const status = document.getElementById('taskStatus').value;
+            
+            console.log('=== SAVING TASK ===');
+            console.log('currentProjectId:', currentProjectId);
+            console.log('Task data:', { title, description, startDate, dueDate, priority, status });
+            
+            if (!title || !startDate || !dueDate) {
+                alert('Please fill in all required fields!');
+                return;
+            }
+            
+            if (new Date(dueDate) < new Date(startDate)) {
+                alert('Due date cannot be before start date!');
+                return;
+            }
+            
+            if (editingTaskId) {
+                const task = tasks.find(t => t.id === editingTaskId);
+                task.title = title;
+                task.description = description;
+                task.startDate = startDate;
+                task.dueDate = dueDate;
+                task.priority = priority;
+                task.status = status;
+                console.log('Updated existing task:', task);
+            } else {
+                const newTask = {
+                    id: Date.now(),
+                    projectId: currentProjectId,
+                    title: title,
+                    description: description,
+                    startDate: startDate,
+                    dueDate: dueDate,
+                    priority: priority,
+                    status: status,
+                    createdAt: new Date().toISOString()
+                };
+                tasks.push(newTask);
+                console.log('Created new task:', newTask);
+                console.log('Total tasks now:', tasks.length);
+            }
+            
+            // Save to server first
+            await saveTasks();
+            
+            // Then re-render the board to show updated tasks
+            renderKanbanBoard();
+            updateStatistics();
+            closeTaskModal();
+        }
+
+        async function deleteTask(id) {
+            if (confirm('Delete this task?')) {
+                const task = tasks.find(t => t.id === id);
+                deletedItems.push({...task, type: 'task', deletedAt: Date.now()});
+                
+                tasks = tasks.filter(t => t.id !== id);
+                
+                await saveTasks();
+                saveDeletedItems();
+                renderKanbanBoard();
+                updateStatistics();
+            }
+        }
+
+        async function updateTaskStatus(id, newStatus) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.status = newStatus;
+                await saveTasks();
+                updateStatistics();
+            }
+        }
+
+        function filterTasks(filter) {
+            currentTimeFilter = filter;
+            selectedDateStart = null;
+            selectedDateEnd = null;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filter);
+            });
+            
+            updateCurrentDate();
+            renderKanbanBoard();
+        }
+
+        function renderKanbanBoard() {
+            console.log('=== RENDER KANBAN BOARD ===');
+            console.log('currentProjectId:', currentProjectId, 'Type:', typeof currentProjectId);
+            console.log('All tasks:', tasks);
+            
+            // Convert to number to avoid type mismatch
+            const projectIdNum = parseInt(currentProjectId);
+            const projectTasks = tasks.filter(t => parseInt(t.projectId) === projectIdNum);
+            console.log('Tasks for this project:', projectTasks);
+            
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            
+            let filteredTasks = projectTasks;
+            
+            console.log('currentTimeFilter:', currentTimeFilter);
+            
+            // Apply time filter to get tasks based on start date
+            if (currentTimeFilter === 'today') {
+                filteredTasks = projectTasks.filter(t => {
+                    const taskDate = new Date(t.startDate);
+                    taskDate.setHours(0, 0, 0, 0);
+                    return taskDate.getTime() === now.getTime();
+                });
+            } else if (currentTimeFilter === 'week') {
+                const weekStart = new Date(now);
+                weekStart.setDate(now.getDate() - now.getDay());
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                
+                filteredTasks = projectTasks.filter(t => {
+                    const taskDate = new Date(t.startDate);
+                    return taskDate >= weekStart && taskDate <= weekEnd;
+                });
+            } else if (currentTimeFilter === 'month') {
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                
+                filteredTasks = projectTasks.filter(t => {
+                    const taskDate = new Date(t.startDate);
+                    return taskDate >= monthStart && taskDate <= monthEnd;
+                });
+            } else if (currentTimeFilter === 'year') {
+                const yearStart = new Date(now.getFullYear(), 0, 1);
+                const yearEnd = new Date(now.getFullYear(), 11, 31);
+                
+                filteredTasks = projectTasks.filter(t => {
+                    const taskDate = new Date(t.startDate);
+                    return taskDate >= yearStart && taskDate <= yearEnd;
+                });
+            } else if (currentTimeFilter === 'custom' && selectedDateStart && selectedDateEnd) {
+                const start = new Date(selectedDateStart);
+                const end = new Date(selectedDateEnd);
+                
+                filteredTasks = projectTasks.filter(t => {
+                    const taskDate = new Date(t.startDate);
+                    return taskDate >= start && taskDate <= end;
+                });
+            }
+            
+            // Separate tasks
+            const overdueTasks = filteredTasks.filter(t => {
+                const dueDate = new Date(t.dueDate);
+                return dueDate < now && t.status !== 'done';
+            });
+            const openTasks = filteredTasks.filter(t => t.status === 'open' && !overdueTasks.includes(t));
+            const progressTasks = filteredTasks.filter(t => t.status === 'in-progress');
+            const doneTasks = filteredTasks.filter(t => t.status === 'done');
+            
+            console.log('=== SEPARATED TASKS ===');
+            console.log('Overdue:', overdueTasks);
+            console.log('Open:', openTasks);
+            console.log('In Progress:', progressTasks);
+            console.log('Done:', doneTasks);
+            
+            renderKanbanColumn('overdueKanban', overdueTasks, 'overdueKanbanCount');
+            renderKanbanColumn('openKanban', openTasks, 'openKanbanCount');
+            renderKanbanColumn('progressKanban', progressTasks, 'progressKanbanCount');
+            renderKanbanColumn('doneKanban', doneTasks, 'doneKanbanCount');
+            
+            setupDragAndDrop();
+        }
+
+        function showCustomDatePicker() {
+            calendarSelectedDates = [];
+            calendarCurrentMonth = new Date();
+            renderCalendar();
+            document.getElementById('customDateModal').classList.add('active');
+        }
+
+        function closeCustomDateModal() {
+            document.getElementById('customDateModal').classList.remove('active');
+        }
+
+        function renderCalendar() {
+            const year = calendarCurrentMonth.getFullYear();
+            const month = calendarCurrentMonth.getMonth();
+            
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            document.getElementById('calendarMonthYear').textContent = `${monthNames[month]} ${year}`;
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const calendarDays = document.getElementById('calendarDays');
+            calendarDays.innerHTML = '';
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Empty cells for days before month starts
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day disabled';
+                calendarDays.appendChild(emptyDay);
+            }
+            
+            // Days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                
+                const currentDate = new Date(year, month, day);
+                // Format date as YYYY-MM-DD without timezone conversion
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                // Check if today
+                if (currentDate.getTime() === today.getTime()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // Check if selected
+                if (calendarSelectedDates.includes(dateStr)) {
+                    dayElement.classList.add('selected');
+                }
+                
+                // Check if in range
+                if (calendarSelectedDates.length === 2) {
+                    const [start, end] = calendarSelectedDates.sort();
+                    if (dateStr > start && dateStr < end) {
+                        dayElement.classList.add('in-range');
+                    }
+                }
+                
+                dayElement.addEventListener('click', () => selectDate(dateStr));
+                
+                calendarDays.appendChild(dayElement);
+            }
+            
+            updateSelectedDatesInfo();
+        }
+
+        function changeMonth(delta) {
+            calendarCurrentMonth.setMonth(calendarCurrentMonth.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function selectDate(dateStr) {
+            if (calendarSelectedDates.length === 0) {
+                // First date selection
+                calendarSelectedDates.push(dateStr);
+            } else if (calendarSelectedDates.length === 1) {
+                // Second date selection - automatically apply filter
+                calendarSelectedDates.push(dateStr);
+                calendarSelectedDates.sort();
+                
+                // Auto-apply the filter
+                const [start, end] = calendarSelectedDates;
+                selectedDateStart = start;
+                selectedDateEnd = end;
+                currentTimeFilter = 'custom';
+                
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.filter === 'custom');
+                });
+                
+                updateCurrentDate();
+                renderKanbanBoard();
+                
+                // Close modal after a brief delay to show selection
+                setTimeout(() => {
+                    closeCustomDateModal();
+                }, 300);
+            } else {
+                // Reset and start new selection
+                calendarSelectedDates = [dateStr];
+            }
+            
+            renderCalendar();
+        }
+
+        function updateSelectedDatesInfo() {
+            const info = document.getElementById('selectedDatesInfo');
+            if (calendarSelectedDates.length === 0) {
+                info.textContent = 'No dates selected';
+            } else if (calendarSelectedDates.length === 1) {
+                const date = new Date(calendarSelectedDates[0] + 'T00:00:00');
+                info.textContent = `Selected: ${formatDateDisplay(date)} (select another date)`;
+            } else {
+                const [start, end] = calendarSelectedDates;
+                const startDate = new Date(start + 'T00:00:00');
+                const endDate = new Date(end + 'T00:00:00');
+                info.textContent = `Range: ${formatDateDisplay(startDate)} to ${formatDateDisplay(endDate)}`;
+            }
+        }
+        
+        function formatDateDisplay(date) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+        }
+
+        function applyCustomDateFilter() {
+            if (calendarSelectedDates.length !== 2) {
+                alert('Please select two dates to create a range!');
+                return;
+            }
+            
+            const [start, end] = calendarSelectedDates.sort();
+            selectedDateStart = start;
+            selectedDateEnd = end;
+            currentTimeFilter = 'custom';
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === 'custom');
+            });
+            
+            closeCustomDateModal();
+            updateCurrentDate();
+            renderKanbanBoard();
+        }
+
+        function showCustomDateFilter() {
+            document.getElementById('customStartDate').value = '';
+            document.getElementById('customEndDate').value = '';
+            document.getElementById('customDateModal').classList.add('active');
+        }
+
+        function closeCustomDateModal() {
+            document.getElementById('customDateModal').classList.remove('active');
+        }
+
+        function applyCustomDateFilter() {
+            const start = document.getElementById('customStartDate').value;
+            const end = document.getElementById('customEndDate').value;
+            
+            if (!start || !end) {
+                alert('Please select both start and end dates!');
+                return;
+            }
+            
+            if (new Date(end) < new Date(start)) {
+                alert('End date cannot be before start date!');
+                return;
+            }
+            
+            selectedDateStart = start;
+            selectedDateEnd = end;
+            currentTimeFilter = 'custom';
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === 'custom');
+            });
+            
+            closeCustomDateModal();
+            updateCurrentDate();
+            renderTasks();
+        }
+
+        function updateStatistics() {
+            const projectTasks = tasks.filter(t => t.projectId === currentProjectId);
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            
+            const overdueCount = projectTasks.filter(t => {
+                const dueDate = new Date(t.dueDate);
+                return dueDate < now && t.status !== 'done';
+            }).length;
+            
+            const openCount = projectTasks.filter(t => t.status === 'open').length;
+            const progressCount = projectTasks.filter(t => t.status === 'in-progress').length;
+            const doneCount = projectTasks.filter(t => t.status === 'done').length;
+            
+            document.getElementById('overdueCount').textContent = overdueCount;
+            document.getElementById('openCount').textContent = openCount;
+            document.getElementById('progressCount').textContent = progressCount;
+            document.getElementById('doneCount').textContent = doneCount;
+            document.getElementById('totalCount').textContent = projectTasks.length;
+        }
+
+        // ==================== KANBAN BOARD ====================
+        function renderKanbanColumn(columnId, columnTasks, countId) {
+            const column = document.getElementById(columnId);
+            const count = document.getElementById(countId);
+            
+            count.textContent = columnTasks.length;
+            
+            if (columnTasks.length === 0) {
+                column.innerHTML = `
+                    <div class="kanban-empty">
+                        <i class="fas fa-inbox"></i>
+                        <p>No tasks here</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            column.innerHTML = columnTasks.map(task => `
+                <div class="kanban-task" draggable="true" data-task-id="${task.id}">
+                    <div class="kanban-task-header">
+                        <div class="task-checkbox ${task.status === 'done' ? 'checked' : ''}" 
+                             onclick="toggleTaskComplete(${task.id})"></div>
+                        <div class="kanban-task-title ${task.status === 'done' ? 'completed' : ''}" 
+                             id="task-title-${task.id}"
+                             onclick="editTaskTitleInline(${task.id})"
+                             style="cursor: text;">${task.title}</div>
+                    </div>
+                    <div class="kanban-task-actions">
+                        <button class="kanban-task-btn edit" onclick="editTaskFull(${task.id})">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button class="kanban-task-btn delete" onclick="deleteTask(${task.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="kanban-task-meta">
+                        <div class="kanban-task-date">
+                            <i class="fas fa-calendar"></i>
+                            Due: ${formatDate(task.dueDate)}
+                        </div>
+                        <div class="kanban-task-priority ${task.priority}">
+                            ${task.priority}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addQuickTask(status) {
+            const newTask = {
+                id: Date.now(),
+                projectId: currentProjectId,
+                title: 'Enter your task title',
+                description: '',
+                startDate: new Date().toISOString().split('T')[0],
+                dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                priority: 'medium',
+                status: status,
+                createdAt: new Date().toISOString()
+            };
+            
+            tasks.push(newTask);
+            saveTasks();
+            renderKanbanBoard();
+            updateStatistics();
+            
+            // Auto-select title for editing
+            setTimeout(() => {
+                editTaskTitleInline(newTask.id);
+            }, 100);
+        }
+
+        function editTaskTitleInline(taskId) {
+            const titleElement = document.getElementById(`task-title-${taskId}`);
+            if (!titleElement) return;
+            
+            const task = tasks.find(t => t.id === taskId);
+            const currentTitle = task.title;
+            
+            titleElement.contentEditable = true;
+            titleElement.classList.add('editable');
+            titleElement.focus();
+            
+            // Select all text
+            const range = document.createRange();
+            range.selectNodeContents(titleElement);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            
+            const saveTitle = () => {
+                const newTitle = titleElement.textContent.trim();
+                if (newTitle && newTitle !== currentTitle) {
+                    task.title = newTitle;
+                    saveTasks();
+                }
+                titleElement.contentEditable = false;
+                titleElement.classList.remove('editable');
+                renderKanbanBoard();
+            };
+            
+            titleElement.addEventListener('blur', saveTitle, { once: true });
+            titleElement.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    titleElement.blur();
+                }
+                if (e.key === 'Escape') {
+                    titleElement.textContent = currentTitle;
+                    titleElement.blur();
+                }
+            }, { once: true });
+        }
+
+        function editTaskFull(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            editingTaskId = taskId;
+            document.getElementById('taskModalTitle').textContent = 'Edit Task';
+            document.getElementById('taskTitle').value = task.title;
+            document.getElementById('taskDescription').value = task.description || '';
+            document.getElementById('taskStartDate').value = task.startDate;
+            document.getElementById('taskDueDate').value = task.dueDate;
+            document.getElementById('taskPriority').value = task.priority;
+            document.getElementById('taskStatus').value = task.status;
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        function toggleTaskComplete(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            if (task.status === 'done') {
+                task.status = 'open';
+            } else {
+                task.status = 'done';
+            }
+            
+            saveTasks();
+            renderKanbanBoard();
+            updateStatistics();
+        }
+
+        function setupDragAndDrop() {
+            const draggables = document.querySelectorAll('.kanban-task');
+            const dropzones = document.querySelectorAll('.kanban-tasks');
+            
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    draggable.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/html', draggable.innerHTML);
+                });
+                
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('dragging');
+                });
+            });
+            
+            dropzones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                    e.dataTransfer.dropEffect = 'move';
+                });
+                
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+                
+                zone.addEventListener('drop', async (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    
+                    const dragging = document.querySelector('.dragging');
+                    if (!dragging) return;
+                    
+                    const taskId = parseInt(dragging.getAttribute('data-task-id'));
+                    const newStatus = zone.getAttribute('data-status');
+                    
+                    const task = tasks.find(t => t.id === taskId);
+                    if (task) {
+                        // Don't allow moving to overdue - it's auto-calculated
+                        if (newStatus === 'overdue') {
+                            renderKanbanBoard();
+                            return;
+                        }
+                        
+                        task.status = newStatus;
+                        await saveTasks();
+                        renderKanbanBoard();
+                        updateStatistics();
+                    }
+                });
+            });
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+        }
+
+        async function saveTasks() {
+            console.log('=== SAVING TASKS TO SERVER ===');
+            console.log('Current userCode:', userCode);
+            console.log('Current projectId:', currentProjectId);
+            console.log('Tasks array:', tasks);
+            console.log('Number of tasks:', tasks.length);
+            console.log('API URL:', API_URL);
+            
+            // Check if we have valid data
+            if (!userCode) {
+                console.error('❌ No userCode - cannot save!');
+                alert('Error: Not logged in. Please refresh and login again.');
+                return { success: false, error: 'No user code' };
+            }
+            
+            if (!Array.isArray(tasks)) {
+                console.error('❌ Tasks is not an array:', tasks);
+                return { success: false, error: 'Invalid tasks data' };
+            }
+            
+            // Log the actual payload
+            const payload = {
+                action: 'save-tasks',
+                code: userCode,
+                tasks: tasks.map(t => ({
+                    id: t.id,
+                    projectId: t.projectId,
+                    title: t.title,
+                    description: t.description,
+                    startDate: t.startDate,
+                    dueDate: t.dueDate,
+                    priority: t.priority,
+                    status: t.status,
+                    createdAt: t.createdAt
+                }))
+            };
+            
+            console.log('Payload being sent:', JSON.stringify(payload, null, 2));
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
+                const result = await response.json();
+                console.log('Save tasks response:', result);
+                
+                if (result.success) {
+                    console.log('✅ Tasks saved successfully to server');
+                } else {
+                    console.error('❌ Failed to sync tasks:', result);
+                    console.error('Error details:', result.error);
+                    alert('Warning: Tasks may not have been saved to server.\nError: ' + (result.error || 'Unknown error') + '\n\nCheck console for details.');
+                }
+                
+                return result;
+            } catch (error) {
+                console.error('❌ Network/Sync error:', error);
+                console.error('Error name:', error.name);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                alert('Error: Could not save tasks to server.\nError: ' + error.message + '\n\nPlease check:\n1. Internet connection\n2. API endpoint is accessible\n3. Browser console for details');
+                return { success: false, error: error.message };
+            }
+        }
+
+        // ==================== TRASH ====================
+        function showTrash() {
+            const trashItems = document.getElementById('trashItems');
+            
+            if (deletedItems.length === 0) {
+                trashItems.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-trash"></i>
+                        <p>Trash is empty</p>
+                    </div>
+                `;
+            } else {
+                trashItems.innerHTML = deletedItems.map(item => {
+                    const deletedTime = new Date(item.deletedAt);
+                    const timeAgo = formatTimeAgo(deletedTime);
+                    
+                    return `
+                        <div class="trash-item">
+                            <div class="trash-info">
+                                <div class="trash-title">${item.title || item.name}</div>
+                                <div class="trash-meta">
+                                    <span><i class="fas fa-clock"></i> Deleted ${timeAgo}</span>
+                                    <span><i class="fas fa-tag"></i> ${item.type}</span>
+                                </div>
+                            </div>
+                            <div class="trash-actions">
+                                <button class="restore-btn" onclick="restoreItem(${item.id})">
+                                    <i class="fas fa-undo"></i> Restore
+                                </button>
+                                <button class="permanent-delete-btn" onclick="permanentDelete(${item.id})">
+                                    <i class="fas fa-times"></i> Delete Forever
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            document.getElementById('trashModal').classList.add('active');
+        }
+
+        function closeTrashModal() {
+            document.getElementById('trashModal').classList.remove('active');
+        }
+
+        async function restoreItem(itemId) {
+            const item = deletedItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            if (confirm('Restore this item?')) {
+                deletedItems = deletedItems.filter(i => i.id !== itemId);
+                
+                if (item.type === 'task') {
+                    tasks.push(item);
+                    await saveTasks();
+                }
+                
+                saveDeletedItems();
+                
+                if (currentProjectId) {
+                    renderKanbanBoard();
+                    updateStatistics();
+                }
+                
+                showTrash();
+            }
+        }
+
+        function permanentDelete(itemId) {
+            if (confirm('Permanently delete this item? This cannot be undone!')) {
+                deletedItems = deletedItems.filter(i => i.id !== itemId);
+                saveDeletedItems();
+                showTrash();
+            }
+        }
+
+        function formatTimeAgo(date) {
+            const seconds = Math.floor((Date.now() - date) / 1000);
+            
+            if (seconds < 60) return 'just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+            return `${Math.floor(seconds / 86400)}d ago`;
+        }
+
+        function saveDeletedItems() {
+            localStorage.setItem(`deleted_${userCode}`, JSON.stringify(deletedItems));
+        }
+
+        // ==================== IMPORT/EXPORT ====================
+        function showImportExportOptions() {
+            document.getElementById('importExportModal').classList.add('active');
+        }
+
+        function closeImportExportModal() {
+            document.getElementById('importExportModal').classList.remove('active');
+        }
+
+        function exportToFile() {
+            const exportData = {
+                user: {
+                    name: userName,
+                    gender: userGender,
+                    code: userCode
+                },
+                exportDate: new Date().toISOString(),
+                workspaces: workspaces,
+                projects: projects,
+                tasks: tasks,
+                deletedItems: deletedItems,
+                statistics: {
+                    totalWorkspaces: workspaces.length,
+                    totalProjects: projects.length,
+                    totalTasks: tasks.length,
+                    openTasks: tasks.filter(t => t.status === 'open').length,
+                    progressTasks: tasks.filter(t => t.status === 'in-progress').length,
+                    doneTasks: tasks.filter(t => t.status === 'done').length
+                }
+            };
+
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `task_manager_backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            closeImportExportModal();
+            alert('✅ Data exported successfully!');
+        }
+
+        function importFromFile() {
+            document.getElementById('fileInput').click();
+            closeImportExportModal();
+        }
+
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.workspaces && data.projects && data.tasks) {
+                        if (confirm(`Import ${data.workspaces.length} workspaces, ${data.projects.length} projects, and ${data.tasks.length} tasks?\n\nThis will replace your current data.`)) {
+                            workspaces = data.workspaces;
+                            projects = data.projects;
+                            tasks = data.tasks;
+                            deletedItems = data.deletedItems || [];
+                            
+                            saveWorkspaces();
+                            saveProjects();
+                            saveTasks();
+                            saveDeletedItems();
+                            
+                            currentWorkspaceId = null;
+                            currentProjectId = null;
+                            
+                            renderWorkspaces();
+                            document.getElementById('projectsContainer').classList.remove('visible');
+                            document.getElementById('taskManagementSection').classList.remove('visible');
+                            
+                            alert('✅ Data imported successfully!');
+                        }
+                    } else {
+                        alert('❌ Invalid backup file format!');
+                    }
+                } catch (error) {
+                    console.error('Import error:', error);
+                    alert('❌ Failed to import data. Please check the file format.');
+                }
+            };
+            
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        setInterval(updateGreeting, 60000);
+        setInterval(updateCurrentDate, 60000);
+    </script>
+</body>
+</html>

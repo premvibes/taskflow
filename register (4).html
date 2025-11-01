@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register User - Task Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .register-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 25px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .gender-selection {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .gender-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .gender-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .gender-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #666;
+            background: white;
+        }
+
+        .gender-option input[type="radio"]:checked + .gender-label {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .gender-label:hover {
+            border-color: #667eea;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .register-btn:active {
+            transform: translateY(0);
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            text-align: center;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 2px solid #10b981;
+            display: block;
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 2px solid #ef4444;
+            display: block;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-link a:hover {
+            color: #764ba2;
+        }
+
+        .info-box {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #4f46e5;
+            font-size: 0.9rem;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h1>👤 Register New User</h1>
+        <p class="subtitle">Create account for Task Management Portal</p>
+
+        <div class="info-box">
+            <strong>⚠️ Important:</strong>
+            Remember your secret code! You'll need it to access the task management portal.
+        </div>
+
+        <div id="messageBox" class="message"></div>
+
+        <form id="registerForm" onsubmit="registerUser(event)">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="userName" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Secret Code</label>
+                <input type="password" id="secretCode" placeholder="Create a strong secret code" required minlength="6">
+                <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                    Minimum 6 characters
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Secret Code</label>
+                <input type="password" id="confirmCode" placeholder="Re-enter your secret code" required>
+            </div>
+
+            <div class="form-group">
+                <label>Gender</label>
+                <div class="gender-selection">
+                    <div class="gender-option">
+                        <input type="radio" id="male" name="gender" value="male" checked>
+                        <label for="male" class="gender-label">👨 Male (Sir)</label>
+                    </div>
+                    <div class="gender-option">
+                        <input type="radio" id="female" name="gender" value="female">
+                        <label for="female" class="gender-label">👩 Female (Ma'am)</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="register-btn">Create Account</button>
+        </form>
+
+        <div class="back-link">
+            <a href="index.html">← Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://successunlock.com/taskflow/api.php';
+
+        function showMessage(message, type) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = `message ${type}`;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageBox.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        async function registerUser(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('userName').value.trim();
+            const code = document.getElementById('secretCode').value;
+            const confirmCode = document.getElementById('confirmCode').value;
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+
+            // Validation
+            if (code !== confirmCode) {
+                showMessage('Secret codes do not match!', 'error');
+                return;
+            }
+
+            if (code.length < 6) {
+                showMessage('Secret code must be at least 6 characters!', 'error');
+                return;
+            }
+
+            if (name.length < 2) {
+                showMessage('Please enter a valid name!', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'register-user',
+                        name: name,
+                        code: code,
+                        gender: gender
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('✅ Account created successfully! Redirecting to login...', 'success');
+                    document.getElementById('registerForm').reset();
+                    
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    showMessage('❌ ' + (result.error || 'Registration failed'), 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Network error. Please try again.', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
